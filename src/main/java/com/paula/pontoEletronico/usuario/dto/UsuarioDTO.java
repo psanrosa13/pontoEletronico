@@ -1,32 +1,23 @@
-package com.paula.pontoEletronico.usuario.model;
+package com.paula.pontoEletronico.usuario.dto;
 
 import java.time.LocalDate;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
-import org.hibernate.validator.constraints.br.CPF;
 
-@Entity
-public class Usuario {
+public class UsuarioDTO {
 
-	@Id
-	@GeneratedValue
 	private Long id;
 	
-	@NotBlank
+	@NotBlank(message = "O campo nome é obrigatório")
 	private String nomeCompleto;
 	
-	@CPF
-	@NotBlank
 	private String cpf;
 	
-	@Email
-	@NotBlank
+	@Email(message = "formato ou valor do campo email esta inválido")
 	private String email;
+	
 	
 	private LocalDate dataDeCadastro;
 
@@ -69,6 +60,5 @@ public class Usuario {
 	public void setDataDeCadastro(LocalDate dataDeCadastro) {
 		this.dataDeCadastro = dataDeCadastro;
 	}
-	
 	
 }

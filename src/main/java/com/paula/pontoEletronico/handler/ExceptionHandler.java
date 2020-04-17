@@ -16,5 +16,14 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler{
 			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(exception.getMessage());
 	}
 	
+	@org.springframework.web.bind.annotation.ExceptionHandler( {Exception.class} )
+	protected ResponseEntity<Object> tratar(Exception exception) {
+			exception.printStackTrace();
+			
+			System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>OOOOOOOOOOOOOOOOOOOOOOOO");
+		
+			return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(exception.getMessage());
+	}
+	
 	
 }

@@ -2,12 +2,11 @@ package com.paula.pontoEletronico.usuario.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +16,12 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.paula.pontoEletronico.usuario.dto.UsuarioDTO;
+
+import br.com.six2six.fixturefactory.Fixture;
+import br.com.six2six.fixturefactory.loader.FixtureFactoryLoader;
 
 
 @RunWith(SpringRunner.class)
@@ -31,33 +32,27 @@ public class UsuarioControllerTeste {
 	@Autowired
 	private MockMvc mockMvc;
 	
-	private Long usuarioId;
+	Gson gson = new Gson();
 	
-	private String USUARIO_NOVO_PRIMEIRO = "{\"cpf\": \"356.333.740-37\",\"dataDeCadastro\": \"2020-02-02\",\"email\": \"tatianaferraz7@gmail.com\",\"nomeCompleto\": \"Tatiana Ferraz\"}";
-	private String USUARIO_NOVO = "{\"cpf\": \"108.702.670-94\",\"dataDeCadastro\": \"2020-02-20\",\"email\": \"psa7@gmail.com\",\"nomeCompleto\": \"Paula Macedo Santana\"}";
-	private String USUARIO_NOVO_INCOMPLETO = "{\"cpf\": \"717.708.090-23\",\"email\": \"psa7@gmail.com\",\"nomeCompleto\": \"Paula Macedo Santana\"}";
-	
-	@Before
-	public void init() throws Exception {
-
-		MvcResult result = mockMvc.perform(post("/usuario")
-			      .content(USUARIO_NOVO_PRIMEIRO)
-			      .contentType(MediaType.APPLICATION_JSON))
-			      .andExpect(status().isCreated())
-			      .andDo(print())
-	              .andReturn();
-	
-	
-		Gson gson = new Gson();
-		JsonObject json = gson.fromJson(result.getResponse().getContentAsString(), JsonObject.class);
-		usuarioId = json.get("id").getAsLong();
-	
+	@BeforeClass
+	public static void setUp() {
+	    FixtureFactoryLoader.loadTemplates("com.paula.pontoEletronico.templates");
 	}
 	
 	@Test
-	public void quandoIncluirNovoUsuarioDeveRetornarStatusCreatedEId() throws Exception {
-		mockMvc.perform(post("/usuario")
-			      .content(USUARIO_NOVO)
+	public void quandoIncluirNovoUsuarioDeveRetornarStatusCreatedId() throws Exception {
+		UsuarioDTO primeiroUsuario = Fixture.from(UsuarioDTO.class).gimme("primeiro_usuario");
+		
+		mockMvc.perform(post("/usuarios")
+			      .contentType(MediaType.APPLICATION_JSON)
+			      .content(gson.toJson(primeiroUsuario))
+			      .accept(MediaType.APPLICATION_JSON))
+			      .andExpect(status().isCreated());
+	
+		UsuarioDTO segundoUsuario = Fixture.from(UsuarioDTO.class).gimme("segundo_usuario");
+		
+		mockMvc.perform(post("/usuarios")
+			      .content(gson.toJson(segundoUsuario))
 			      .contentType(MediaType.APPLICATION_JSON)
 			      .accept(MediaType.APPLICATION_JSON))
 			      .andExpect(status().isCreated())
@@ -66,7 +61,7 @@ public class UsuarioControllerTeste {
 	
 	@Test
 	public void quandoIncluirNovoUsuarioSemBodyDeveRetornarBadRequest() throws Exception {	
-		mockMvc.perform(post("/usuario")
+		mockMvc.perform(post("/usuarios")
 			      .content("")
 			      .contentType(MediaType.APPLICATION_JSON)
 			      .accept(MediaType.APPLICATION_JSON))
@@ -75,7 +70,7 @@ public class UsuarioControllerTeste {
 	
 	@Test
 	public void quandoIncluirNovoUsuarioComObjetoVazioDeveRetornarBadRequest() throws Exception {
-		mockMvc.perform(post("/usuario")
+		mockMvc.perform(post("/usuarios")
 			      .content("{}")
 			      .contentType(MediaType.APPLICATION_JSON)
 			      .accept(MediaType.APPLICATION_JSON))
@@ -83,9 +78,11 @@ public class UsuarioControllerTeste {
 	}
 	
 	@Test
-	public void quandoIncluirNovoUsuarioSemDataCadastroDeveRetornarBadRequest() throws Exception {
-		mockMvc.perform(post("/usuario")
-			      .content(USUARIO_NOVO_INCOMPLETO)
+	public void quandoIncluirNovoUsuarioSemNomeDeveRetornarBadRequest() throws Exception {
+		UsuarioDTO usuarioDTO = Fixture.from(UsuarioDTO.class).gimme("usuario_sem_nome");
+		
+		mockMvc.perform(post("/usuarios")
+			      .content(gson.toJson(usuarioDTO))
 			      .contentType(MediaType.APPLICATION_JSON)
 			      .accept(MediaType.APPLICATION_JSON))
 			      .andExpect(status().isBadRequest());
@@ -93,7 +90,7 @@ public class UsuarioControllerTeste {
 	
 	@Test
 	public void quandoConsultarUmClienteNaoRegistradoDeveRetornarUmaMensagemDeErro() throws Exception {
-		mockMvc.perform(get("/usuario/{id}", "19")
+		mockMvc.perform(get("/usuarios/{id}", "19")
 			      .contentType(MediaType.APPLICATION_JSON)
 			      .accept(MediaType.APPLICATION_JSON))
 			      .andExpect(status().is4xxClientError())
@@ -102,8 +99,16 @@ public class UsuarioControllerTeste {
 	
 	@Test
 	public void quandoConsultarUmClienteRegistrado() throws Exception {
-		mockMvc.perform(get("/usuario/{id}", usuarioId)
-			      .content(USUARIO_NOVO_INCOMPLETO)
+		UsuarioDTO primeiroUsuario = Fixture.from(UsuarioDTO.class).gimme("primeiro_usuario");
+		
+		mockMvc.perform(post("/usuarios")
+			      .contentType(MediaType.APPLICATION_JSON)
+			      .content(gson.toJson(primeiroUsuario))
+			      .accept(MediaType.APPLICATION_JSON))
+			      .andExpect(status().isCreated());
+		
+		mockMvc.perform(get("/usuarios/{id}", 1)
+			      .content("")
 			      .contentType(MediaType.APPLICATION_JSON)
 			      .accept(MediaType.APPLICATION_JSON))
 			      .andExpect(status().isOk())

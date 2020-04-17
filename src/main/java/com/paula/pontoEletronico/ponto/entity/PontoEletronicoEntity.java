@@ -1,4 +1,4 @@
-package com.paula.pontoEletronico.ponto.model;
+package com.paula.pontoEletronico.ponto.entity;
 
 import java.time.LocalDateTime;
 
@@ -7,20 +7,22 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import com.paula.pontoEletronico.usuario.model.Usuario;
+import org.modelmapper.ModelMapper;
+
+import com.paula.pontoEletronico.ponto.dto.PontoEletronicoDTO;
+import com.paula.pontoEletronico.usuario.entity.UsuarioEntity;
 
 @Entity
-public class Ponto {
+public class PontoEletronicoEntity {
+	
 	@Id
 	@GeneratedValue
 	private Long id;
 	
     @ManyToOne
-    @JoinColumn
-	private Usuario usuario;
+	private UsuarioEntity usuario;
 	
 	private LocalDateTime registro;
 
@@ -35,11 +37,11 @@ public class Ponto {
 		this.id = id;
 	}
 
-	public Usuario getUsuario() {
+	public UsuarioEntity getUsuario() {
 		return usuario;
 	}
 
-	public void setUsuario(Usuario usuario) {
+	public void setUsuario(UsuarioEntity usuario) {
 		this.usuario = usuario;
 	}
 
@@ -59,4 +61,12 @@ public class Ponto {
 		this.tipo = tipo;
 	}
 
+	
+	public PontoEletronicoDTO getPontoEletronicoDTO() {
+		ModelMapper  modelMapper = new ModelMapper();
+		
+		PontoEletronicoDTO pontoEletronicoDTO = modelMapper.map(this, PontoEletronicoDTO.class);
+		
+		return pontoEletronicoDTO;
+	}
 }
