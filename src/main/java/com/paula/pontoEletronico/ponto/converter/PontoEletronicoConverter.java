@@ -13,22 +13,20 @@ import com.paula.pontoEletronico.ponto.entity.PontoEletronicoEntity;
 
 @Component
 public class PontoEletronicoConverter {
-	
-	@Autowired
-	private ModelMapper modelMapper;
-	
-	public PontoEletronicoEntity convertFromEntity(PontoEletronicoDTO pontoEletronicoDTO){
-		PontoEletronicoEntity pontoEletronicoEntity = 
-				modelMapper.map(pontoEletronicoDTO, PontoEletronicoEntity.class);
-	
-		return pontoEletronicoEntity;
+
+	private final ModelMapper modelMapper;
+
+	public PontoEletronicoConverter(ModelMapper modelMapper) {
+		this.modelMapper = modelMapper;
 	}
 
+	public PontoEletronicoEntity convertFromEntity(PontoEletronicoDTO pontoEletronicoDTO){
+		return modelMapper.map(pontoEletronicoDTO, PontoEletronicoEntity.class);
+		}
+
 	public PontoEletronicoDTO convertFromDTO(PontoEletronicoEntity pontoEletronicoEntity){
-		PontoEletronicoDTO pontoEletronicoDTO = 
-				modelMapper.map(pontoEletronicoEntity, PontoEletronicoDTO.class);
-	
-		return pontoEletronicoDTO;
+		return	modelMapper.map(pontoEletronicoEntity, PontoEletronicoDTO.class);
+
 	}
 	
 	public List<PontoEletronicoDTO> createFromDtos(Collection<PontoEletronicoEntity> entities) {

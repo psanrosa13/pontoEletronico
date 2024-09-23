@@ -6,42 +6,31 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import com.paula.pontoEletronico.templates.UsuarioDtoTemplates;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.google.gson.Gson;
 import com.paula.pontoEletronico.usuario.dto.UsuarioDTO;
 
-import br.com.six2six.fixturefactory.Fixture;
-import br.com.six2six.fixturefactory.loader.FixtureFactoryLoader;
-
-
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT )
 @AutoConfigureMockMvc
-public class UsuarioControllerTeste {
+public class UsuarioControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
 	
 	Gson gson = new Gson();
-	
-	@BeforeClass
-	public static void setUp() {
-	    FixtureFactoryLoader.loadTemplates("com.paula.pontoEletronico.templates");
-	}
+
 	
 	@Test
 	public void quandoIncluirNovoUsuarioDeveRetornarStatusCreatedId() throws Exception {
-		UsuarioDTO primeiroUsuario = Fixture.from(UsuarioDTO.class).gimme("primeiro_usuario");
+		UsuarioDTO primeiroUsuario = UsuarioDtoTemplates.getPrimeiroUsuario();
 		
 		mockMvc.perform(post("/usuarios")
 			      .contentType(MediaType.APPLICATION_JSON)
@@ -49,7 +38,7 @@ public class UsuarioControllerTeste {
 			      .accept(MediaType.APPLICATION_JSON))
 			      .andExpect(status().isCreated());
 	
-		UsuarioDTO segundoUsuario = Fixture.from(UsuarioDTO.class).gimme("segundo_usuario");
+		UsuarioDTO segundoUsuario = UsuarioDtoTemplates.getSegundoUsuario();
 		
 		mockMvc.perform(post("/usuarios")
 			      .content(gson.toJson(segundoUsuario))
@@ -79,7 +68,7 @@ public class UsuarioControllerTeste {
 	
 	@Test
 	public void quandoIncluirNovoUsuarioSemNomeDeveRetornarBadRequest() throws Exception {
-		UsuarioDTO usuarioDTO = Fixture.from(UsuarioDTO.class).gimme("usuario_sem_nome");
+		UsuarioDTO usuarioDTO = UsuarioDtoTemplates.getUsuarioSemNome();
 		
 		mockMvc.perform(post("/usuarios")
 			      .content(gson.toJson(usuarioDTO))
@@ -99,7 +88,7 @@ public class UsuarioControllerTeste {
 	
 	@Test
 	public void quandoConsultarUmClienteRegistrado() throws Exception {
-		UsuarioDTO primeiroUsuario = Fixture.from(UsuarioDTO.class).gimme("primeiro_usuario");
+		UsuarioDTO primeiroUsuario = UsuarioDtoTemplates.getPrimeiroUsuario();
 		
 		mockMvc.perform(post("/usuarios")
 			      .contentType(MediaType.APPLICATION_JSON)

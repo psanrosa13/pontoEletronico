@@ -13,10 +13,13 @@ import com.paula.pontoEletronico.usuario.repository.UsuarioRepository;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService{
-	
-	@Autowired
+
 	private UsuarioRepository usuarioRepository;
-	
+
+	public UsuarioServiceImpl(UsuarioRepository usuarioRepository) {
+		this.usuarioRepository = usuarioRepository;
+	}
+
 	public UsuarioEntity salvar(UsuarioEntity usuario) {
 		usuario.setDataDeCadastro(LocalDate.now());
 		

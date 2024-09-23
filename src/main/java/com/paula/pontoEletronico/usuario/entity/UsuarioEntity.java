@@ -2,13 +2,9 @@ package com.paula.pontoEletronico.usuario.entity;
 
 import java.time.LocalDate;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-
-import org.hibernate.validator.constraints.br.CPF;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 
 @Entity
 public class UsuarioEntity {
@@ -17,15 +13,15 @@ public class UsuarioEntity {
 	@GeneratedValue
 	private Long id;
 	
-	@NotBlank
+	//@NotBlank
 	private String nomeCompleto;
 	
-	@CPF
-	@NotBlank
+	//@CPF
+	//@NotBlank
 	private String cpf;
 	
-	@Email
-	@NotBlank
+	//@Email
+	//@NotBlank
 	private String email;
 	
 	private LocalDate dataDeCadastro;

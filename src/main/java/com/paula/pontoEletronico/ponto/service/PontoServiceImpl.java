@@ -19,12 +19,15 @@ import com.paula.pontoEletronico.usuario.entity.UsuarioEntity;
 @Service
 public class PontoServiceImpl implements PontoService{
 
-	@Autowired
 	private PontoRepository pontoRepository;
-	
-	@Autowired
+
 	private PontoEletronicoConverter pontoEletronicoConverter;
-	
+
+	public PontoServiceImpl(PontoRepository pontoRepository, PontoEletronicoConverter pontoEletronicoConverter) {
+		this.pontoRepository = pontoRepository;
+		this.pontoEletronicoConverter = pontoEletronicoConverter;
+	}
+
 	public PontoEletronicoEntity incluirNovo(PontoEletronicoEntity ponto) {
 		ponto.setRegistro(LocalDateTime.now());
 		
@@ -38,37 +41,34 @@ public class PontoServiceImpl implements PontoService{
 	}
 	
 	public JornadaDTO listaRegistrosDePonto(Long idUsuario) {
-		JornadaDTO jornada = new JornadaDTO();
+
 		UsuarioEntity usuario = new UsuarioEntity();
 		usuario.setId(idUsuario);
 		
 		List<PontoEletronicoEntity> registros= pontoRepository.getRegistrosPorUsuarioEmOrdemDecrescente(usuario);
 		
-		jornada.setRegistros(pontoEletronicoConverter.createFromDtos(registros));
-		
-		preencheTotalHorasTrabalhadas(jornada);
-		
-		return jornada;
+		return new JornadaDTO(getTotalHorasTrabalhadas(registros), pontoEletronicoConverter.createFromDtos(registros));
 	}
 
-	private void preencheTotalHorasTrabalhadas(JornadaDTO jornada) {
+	private Long getTotalHorasTrabalhadas(List<PontoEletronicoEntity> registros) {
 		long total = 0;
 		LocalDateTime valorSaida ;
 		
-		for (PontoEletronicoDTO ponto : jornada.getRegistros()) {
-			valorSaida = LocalDateTime.now();
-			
-			if(ponto.getTipo().equals(TipoPontoEnum.SAIDA)) {
-				valorSaida = ponto.getRegistro();
+		for (PontoEletronicoEntity registro : registros) {
+
+			if(registro.getTipo() == TipoPontoEnum.SAIDA) {
+				valorSaida = registro.getRegistro();
 			}else {
-				total=+ Duration.between(ponto.getRegistro(), valorSaida).toMinutes();
+				valorSaida = LocalDateTime.now();
 			}
+
+			total=+ Duration.between(registro.getRegistro(), valorSaida).toMinutes();
 		}
 		
 		if(total != 0 ) {
-			jornada.setTotal(total/60 );
-		}else {
-			jornada.setTotal(total);
+			return total/60;
 		}
+
+		return total;
 	}
 }

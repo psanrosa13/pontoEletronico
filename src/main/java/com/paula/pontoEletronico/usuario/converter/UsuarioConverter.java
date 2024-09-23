@@ -13,10 +13,13 @@ import com.paula.pontoEletronico.usuario.entity.UsuarioEntity;
 
 @Component
 public class UsuarioConverter {
-	
-	@Autowired
-	private ModelMapper modelMapper;
-	
+
+	private final ModelMapper modelMapper;
+
+	public UsuarioConverter(ModelMapper modelMapper) {
+		this.modelMapper = modelMapper;
+	}
+
 	public UsuarioEntity convertFromEntity(UsuarioDTO usuarioDTO){
 		UsuarioEntity usuarioEntity = modelMapper.map(usuarioDTO, UsuarioEntity.class);
 	

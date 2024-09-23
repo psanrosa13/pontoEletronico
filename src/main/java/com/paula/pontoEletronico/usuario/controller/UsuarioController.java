@@ -2,9 +2,6 @@ package com.paula.pontoEletronico.usuario.controller;
 
 import java.util.List;
 
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,15 +21,18 @@ import com.paula.pontoEletronico.usuario.service.UsuarioService;
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
-	@Autowired
 	UsuarioService usuarioService;
-	
-	@Autowired
+
 	UsuarioConverter usuarioConverter;
-	
+
+	public UsuarioController(UsuarioService usuarioService, UsuarioConverter usuarioConverter) {
+		this.usuarioService = usuarioService;
+		this.usuarioConverter = usuarioConverter;
+	}
+
 	@PostMapping
 	@ResponseStatus(value = HttpStatus.CREATED)
-	public UsuarioDTO inserir(@RequestBody @Valid UsuarioDTO usuario) {
+	public UsuarioDTO inserir(@RequestBody UsuarioDTO usuario) {
 		UsuarioEntity usuarioEntity =
 				usuarioService.salvar(usuarioConverter.convertFromEntity(usuario));
 		
@@ -45,7 +45,7 @@ public class UsuarioController {
 	}
 	
 	@PutMapping("/{id}")
-	public UsuarioDTO altualizar(@RequestBody @Valid UsuarioDTO usuario, @PathVariable Long id) {
+	public UsuarioDTO altualizar(@RequestBody UsuarioDTO usuario, @PathVariable Long id) {
 		UsuarioEntity usuarioEntity = 
 				usuarioService.atualizar(usuarioConverter.convertFromEntity(usuario), id);
 		
